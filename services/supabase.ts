@@ -1,5 +1,5 @@
 import { createClient, PostgrestError } from '@supabase/supabase-js';
-import { Barang, KasHarian, TransaksiKos } from '../types';
+import { Barang, KasHarian, TransaksiKos } from '../types.ts';
 
 const supabaseUrl = 'https://jxnmmlkzeyohhhdmtmcb.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4bm1tbGt6ZXlvaGhoZG10bWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxOTY5NTAsImV4cCI6MjA3MTc3Mjk1MH0.zaD-4Nj_UY8pmldJW4T5F4WUcdFdERCyEtB2pZxijkc';

@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Dashboard from './pages/Dashboard';
-import StokBarang from './pages/StokBarang';
-import KasHarian from './pages/KasHarian';
-import PendapatanKos from './pages/PendapatanKos';
+import Sidebar from './components/Sidebar.tsx';
+import Dashboard from './pages/Dashboard.tsx';
+import StokBarang from './pages/StokBarang.tsx';
+import KasHarian from './pages/KasHarian.tsx';
+import PendapatanKos from './pages/PendapatanKos.tsx';
 
 function App() {
   return (

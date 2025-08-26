@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import DashboardIcon from './icons/DashboardIcon';
-import PackageIcon from './icons/PackageIcon';
-import CashIcon from './icons/CashIcon';
-import HomeIcon from './icons/HomeIcon';
+import DashboardIcon from './icons/DashboardIcon.tsx';
+import PackageIcon from './icons/PackageIcon.tsx';
+import CashIcon from './icons/CashIcon.tsx';
+import HomeIcon from './icons/HomeIcon.tsx';
 
 const navItems = [
   { to: '/', text: 'Dasbor', icon: DashboardIcon },

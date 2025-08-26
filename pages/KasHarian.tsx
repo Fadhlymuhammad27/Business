@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Header from '../components/Header';
-import Modal from '../components/Modal';
-import ConfirmationModal from '../components/ConfirmationModal';
-import { KasHarian } from '../types';
-import { getKasHarian, addKasHarian, updateKasHarian, deleteKasHarian, SupabaseServiceError } from '../services/supabase';
+import Header from '../components/Header.tsx';
+import Modal from '../components/Modal.tsx';
+import ConfirmationModal from '../components/ConfirmationModal.tsx';
+import { KasHarian } from '../types.ts';
+import { getKasHarian, addKasHarian, updateKasHarian, deleteKasHarian, SupabaseServiceError } from '../services/supabase.ts';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import PlusIcon from '../components/icons/PlusIcon';
-import EditIcon from '../components/icons/EditIcon';
-import DeleteIcon from '../components/icons/DeleteIcon';
+import PlusIcon from '../components/icons/PlusIcon.tsx';
+import EditIcon from '../components/icons/EditIcon.tsx';
+import DeleteIcon from '../components/icons/DeleteIcon.tsx';
 
 const KasHarianPage = () => {
   const [data, setData] = useState<KasHarian[]>([]);

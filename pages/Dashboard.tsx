@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import Header from '../components/Header';
-import Card from '../components/Card';
-import { getBarang, getKasHarian, getTransaksiKos, SupabaseServiceError } from '../services/supabase';
-import { Barang, KasHarian, TransaksiKos } from '../types';
+import Header from '../components/Header.tsx';
+import Card from '../components/Card.tsx';
+import { getBarang, getKasHarian, getTransaksiKos, SupabaseServiceError } from '../services/supabase.ts';
+import { Barang, KasHarian, TransaksiKos } from '../types.ts';
 
 // --- SVG Icons for Cards ---
 const MoneyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>;

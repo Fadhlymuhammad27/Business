@@ -1,14 +1,14 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import Header from '../components/Header';
-import Modal from '../components/Modal';
-import ConfirmationModal from '../components/ConfirmationModal';
-import { Barang } from '../types';
-import { getBarang, addBarang, updateBarang, deleteBarang, SupabaseServiceError } from '../services/supabase';
+import Header from '../components/Header.tsx';
+import Modal from '../components/Modal.tsx';
+import ConfirmationModal from '../components/ConfirmationModal.tsx';
+import { Barang } from '../types.ts';
+import { getBarang, addBarang, updateBarang, deleteBarang, SupabaseServiceError } from '../services/supabase.ts';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import PlusIcon from '../components/icons/PlusIcon';
-import EditIcon from '../components/icons/EditIcon';
-import DeleteIcon from '../components/icons/DeleteIcon';
+import PlusIcon from '../components/icons/PlusIcon.tsx';
+import EditIcon from '../components/icons/EditIcon.tsx';
+import DeleteIcon from '../components/icons/DeleteIcon.tsx';
 
 const StokBarang = () => {
   const [searchTerm, setSearchTerm] = useState('');
