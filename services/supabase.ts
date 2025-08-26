@@ -36,6 +36,14 @@ export const updateBarang = async (id: number, barang: Partial<Omit<Barang, 'id'
     return data;
 };
 
+export const deleteBarang = async (id: number): Promise<void> => {
+    const { error } = await supabase.from('stok_barang').delete().eq('id', id);
+    if (error) {
+        console.error('Error deleting barang:', error.message);
+        throw new Error(error.message);
+    }
+};
+
 
 // --- Kas Harian ---
 export const getKasHarian = async (): Promise<KasHarian[]> => {
@@ -65,6 +73,14 @@ export const updateKasHarian = async (id: number, kas: Partial<Omit<KasHarian, '
     return data;
 };
 
+export const deleteKasHarian = async (id: number): Promise<void> => {
+    const { error } = await supabase.from('kas_harian').delete().eq('id', id);
+    if (error) {
+        console.error('Error deleting kas harian:', error.message);
+        throw new Error(error.message);
+    }
+};
+
 
 // --- Transaksi Kos ---
 export const getTransaksiKos = async (): Promise<TransaksiKos[]> => {
@@ -92,4 +108,12 @@ export const updateTransaksiKos = async (id: number, transaksi: Partial<Omit<Tra
         throw new Error(error.message);
     }
     return data;
+};
+
+export const deleteTransaksiKos = async (id: number): Promise<void> => {
+    const { error } = await supabase.from('transaksi_kos').delete().eq('id', id);
+    if (error) {
+        console.error('Error deleting transaksi kos:', error.message);
+        throw new Error(error.message);
+    }
 };

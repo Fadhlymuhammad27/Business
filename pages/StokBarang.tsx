@@ -2,12 +2,14 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { Barang } from '../types';
-import { getBarang, addBarang, updateBarang } from '../services/supabase';
+import { getBarang, addBarang, updateBarang, deleteBarang } from '../services/supabase';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import PlusIcon from '../components/icons/PlusIcon';
 import EditIcon from '../components/icons/EditIcon';
+import DeleteIcon from '../components/icons/DeleteIcon';
 
 const StokBarang = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,6 +18,7 @@ const StokBarang = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<Partial<Barang> | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<Barang | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -107,6 +110,20 @@ const StokBarang = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    setIsSubmitting(true);
+    try {
+        await deleteBarang(itemToDelete.id);
+        fetchData();
+        setItemToDelete(null);
+    } catch (err: any) {
+        alert(`Gagal menghapus data: ${err.message}`);
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
   return (
     <div>
       <Header title="Laporan Stok Barang">
@@ -174,8 +191,9 @@ const StokBarang = () => {
                     <td className="p-4">{item.harga_jual.toLocaleString('id-ID')}</td>
                     <td className="p-4">{item.hpb.toLocaleString('id-ID')}</td>
                     <td className="p-4">
-                      <div className="flex justify-center">
+                      <div className="flex justify-center space-x-2">
                         <button onClick={() => handleOpenModal(item)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full transition-colors"><EditIcon /></button>
+                        <button onClick={() => setItemToDelete(item)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-full transition-colors"><DeleteIcon /></button>
                       </div>
                     </td>
                   </tr>
@@ -192,6 +210,15 @@ const StokBarang = () => {
             onSave={handleSave}
             item={currentItem}
             isSubmitting={isSubmitting}
+        />
+      )}
+      {itemToDelete && (
+        <ConfirmationModal
+            isOpen={!!itemToDelete}
+            onClose={() => setItemToDelete(null)}
+            onConfirm={handleDelete}
+            title="Konfirmasi Hapus"
+            message={`Apakah Anda yakin ingin menghapus barang "${itemToDelete.nama_barang}"? Tindakan ini tidak dapat dibatalkan.`}
         />
       )}
     </div>

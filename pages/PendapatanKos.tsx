@@ -1,13 +1,15 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { TransaksiKos } from '../types';
-import { getTransaksiKos, addTransaksiKos, updateTransaksiKos } from '../services/supabase';
+import { getTransaksiKos, addTransaksiKos, updateTransaksiKos, deleteTransaksiKos } from '../services/supabase';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import PlusIcon from '../components/icons/PlusIcon';
 import EditIcon from '../components/icons/EditIcon';
+import DeleteIcon from '../components/icons/DeleteIcon';
 
 const PendapatanKos = () => {
   const [data, setData] = useState<TransaksiKos[]>([]);
@@ -15,8 +17,8 @@ const PendapatanKos = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<Partial<TransaksiKos> | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<TransaksiKos | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  let saldo = 0;
 
   const fetchData = useCallback(async () => {
     try {
@@ -36,19 +38,25 @@ const PendapatanKos = () => {
     fetchData();
   }, [fetchData]);
 
+  // FIX: Calculate running balance in a pure way using useMemo to prevent render-side effects.
+  const dataWithSaldo = useMemo(() => {
+    return data.reduce((acc, item) => {
+        const previousSaldo = acc.length > 0 ? acc[acc.length - 1].saldo : 0;
+        const saldo = previousSaldo + item.penerimaan - item.pengeluaran;
+        acc.push({ ...item, saldo });
+        return acc;
+    }, [] as (TransaksiKos & { saldo: number })[]);
+  }, [data]);
+
   const handleExportPDF = () => {
     const doc = new jsPDF();
-    let runningSaldo = 0;
-    const bodyData = data.map(item => {
-        runningSaldo += item.penerimaan - item.pengeluaran;
-        return [
-            formatDate(item.tanggal),
-            item.uraian,
-            formatCurrency(item.penerimaan),
-            formatCurrency(item.pengeluaran),
-            formatCurrency(runningSaldo)
-        ]
-    });
+    const bodyData = dataWithSaldo.map(item => [
+        formatDate(item.tanggal),
+        item.uraian,
+        formatCurrency(item.penerimaan),
+        formatCurrency(item.pengeluaran),
+        formatCurrency(item.saldo)
+    ]);
 
     doc.text("Laporan Pendapatan Kos Rosely", 14, 20);
     (doc as any).autoTable({
@@ -113,6 +121,19 @@ const PendapatanKos = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    setIsSubmitting(true);
+    try {
+        await deleteTransaksiKos(itemToDelete.id);
+        fetchData();
+        setItemToDelete(null);
+    } catch (err: any) {
+        alert(`Gagal menghapus data: ${err.message}`);
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
 
   return (
     <div>
@@ -158,23 +179,22 @@ const PendapatanKos = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((item, index) => {
-                  saldo += item.penerimaan - item.pengeluaran;
-                  return (
+                {dataWithSaldo.map((item, index) => (
                     <tr key={item.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                       <td className="p-4 font-medium text-gray-700">{formatDate(item.tanggal)}</td>
                       <td className="p-4 font-semibold text-gray-800">{item.uraian}</td>
                       <td className="p-4 text-right text-green-600 font-medium">{formatCurrency(item.penerimaan)}</td>
                       <td className="p-4 text-right text-red-600 font-medium">{formatCurrency(item.pengeluaran)}</td>
-                      <td className="p-4 text-right font-bold text-brand-primary">{formatCurrency(saldo)}</td>
+                      <td className="p-4 text-right font-bold text-brand-primary">{formatCurrency(item.saldo)}</td>
                       <td className="p-4">
-                      <div className="flex justify-center">
-                        <button onClick={() => handleOpenModal(item)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full transition-colors"><EditIcon /></button>
-                      </div>
-                    </td>
+                        <div className="flex justify-center space-x-2">
+                          <button onClick={() => handleOpenModal(item)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full transition-colors"><EditIcon /></button>
+                          <button onClick={() => setItemToDelete(item)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-full transition-colors"><DeleteIcon /></button>
+                        </div>
+                      </td>
                     </tr>
-                  );
-                })}
+                  )
+                )}
               </tbody>
               <tfoot className="bg-gray-200 font-bold text-lg">
                   <tr>
@@ -196,6 +216,15 @@ const PendapatanKos = () => {
             onSave={handleSave}
             item={currentItem}
             isSubmitting={isSubmitting}
+        />
+      )}
+      {itemToDelete && (
+        <ConfirmationModal
+            isOpen={!!itemToDelete}
+            onClose={() => setItemToDelete(null)}
+            onConfirm={handleDelete}
+            title="Konfirmasi Hapus"
+            message={`Apakah Anda yakin ingin menghapus transaksi "${itemToDelete.uraian}"? Tindakan ini tidak dapat dibatalkan.`}
         />
       )}
     </div>

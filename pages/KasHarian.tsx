@@ -2,12 +2,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { KasHarian } from '../types';
-import { getKasHarian, addKasHarian, updateKasHarian } from '../services/supabase';
+import { getKasHarian, addKasHarian, updateKasHarian, deleteKasHarian } from '../services/supabase';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import PlusIcon from '../components/icons/PlusIcon';
 import EditIcon from '../components/icons/EditIcon';
+import DeleteIcon from '../components/icons/DeleteIcon';
 
 const KasHarianPage = () => {
   const [data, setData] = useState<KasHarian[]>([]);
@@ -15,6 +17,7 @@ const KasHarianPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<Partial<KasHarian> | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<KasHarian | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -116,6 +119,20 @@ const KasHarianPage = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    setIsSubmitting(true);
+    try {
+        await deleteKasHarian(itemToDelete.id);
+        fetchData();
+        setItemToDelete(null);
+    } catch (err: any) {
+        alert(`Gagal menghapus data: ${err.message}`);
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
   return (
     <div>
       <Header title="Laporan Penerimaan Kas Harian">
@@ -175,8 +192,9 @@ const KasHarianPage = () => {
                       {item.total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                     </td>
                     <td className="p-4">
-                      <div className="flex justify-center">
+                      <div className="flex justify-center space-x-2">
                         <button onClick={() => handleOpenModal(item)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full transition-colors"><EditIcon /></button>
+                        <button onClick={() => setItemToDelete(item)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-full transition-colors"><DeleteIcon /></button>
                       </div>
                     </td>
                   </tr>
@@ -207,6 +225,15 @@ const KasHarianPage = () => {
             onSave={handleSave}
             item={currentItem}
             isSubmitting={isSubmitting}
+        />
+      )}
+      {itemToDelete && (
+        <ConfirmationModal
+            isOpen={!!itemToDelete}
+            onClose={() => setItemToDelete(null)}
+            onConfirm={handleDelete}
+            title="Konfirmasi Hapus"
+            message={`Apakah Anda yakin ingin menghapus data kas tanggal ${formatDate(itemToDelete.tanggal)}? Tindakan ini tidak dapat dibatalkan.`}
         />
       )}
     </div>
