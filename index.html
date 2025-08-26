@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jamfadly Mart & Kos Rosely</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,9 +43,12 @@
   }
 }
 </script>
+<!-- Tambahkan Babel untuk mentranspilasi JSX/TSX di browser -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <!-- Ubah tipe skrip menjadi "text/babel" agar Babel dapat memprosesnya -->
+    <script type="text/babel" data-type="module" src="./index.tsx"></script>
   </body>
 </html>
