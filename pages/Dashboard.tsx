@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import Header from '../components/Header';
 import Card from '../components/Card';
-import { getBarang, getKasHarian, getTransaksiKos } from '../services/supabase';
+import { getBarang, getKasHarian, getTransaksiKos, SupabaseServiceError } from '../services/supabase';
 import { Barang, KasHarian, TransaksiKos } from '../types';
 
 // --- SVG Icons for Cards ---
@@ -43,8 +42,15 @@ const Dashboard = () => {
                 setTransaksiKos(kosData);
                 setError(null);
             } catch (err: any) {
-                setError(err.message || 'Gagal memuat data dasbor.');
                 console.error(err);
+                if (err instanceof SupabaseServiceError && err.code === '42501') { // 42501 is 'permission_denied'
+                    setError('Akses ke tabel database ditolak. Ini kemungkinan besar karena Row Level Security (RLS) aktif. Mohon periksa kembali Pengaturan RLS di dasbor Supabase Anda dan pastikan role "anon" memiliki izin "SELECT" pada tabel yang diperlukan.');
+                } else if (err.message) {
+                    setError(`Terjadi kesalahan: ${err.message}`);
+                }
+                else {
+                    setError('Gagal memuat data dasbor karena kesalahan yang tidak diketahui.');
+                }
             } finally {
                 setLoading(false);
             }
@@ -112,10 +118,9 @@ const Dashboard = () => {
     if (error) return (
         <div>
             <Header title="Dasbor Analitik" />
-            <div className="text-center text-red-700 text-xl p-8 bg-red-50 border border-red-200 rounded-lg shadow-md mt-8">
-                <strong className="block text-2xl mb-2">Terjadi Kesalahan</strong>
-                <p className="text-base">{error}</p>
-                 <p className="text-sm text-gray-500 mt-4">Ini mungkin karena masalah koneksi atau konfigurasi Row Level Security (RLS) di database Supabase Anda. Pastikan RLS diatur untuk mengizinkan akses baca.</p>
+            <div className="text-left text-red-800 p-6 bg-red-50 border-l-4 border-red-400 rounded-lg shadow-md mt-8">
+                <strong className="block text-xl font-bold mb-2">Terjadi Kesalahan Saat Memuat Dasbor</strong>
+                <p className="text-base text-gray-700 whitespace-pre-wrap">{error}</p>
             </div>
         </div>
     );

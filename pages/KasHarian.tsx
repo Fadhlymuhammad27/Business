@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { KasHarian } from '../types';
-import { getKasHarian, addKasHarian, updateKasHarian, deleteKasHarian } from '../services/supabase';
+import { getKasHarian, addKasHarian, updateKasHarian, deleteKasHarian, SupabaseServiceError } from '../services/supabase';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import PlusIcon from '../components/icons/PlusIcon';
@@ -27,8 +26,12 @@ const KasHarianPage = () => {
       setData(kasData);
       setError(null);
     } catch (err: any) {
-      setError(err.message || 'Gagal memuat data kas harian.');
       console.error(err);
+      if (err instanceof SupabaseServiceError && err.code === '42501') {
+          setError('Akses ditolak. Periksa konfigurasi Row Level Security (RLS) di Supabase untuk tabel "kas_harian".');
+      } else {
+          setError(err.message || 'Gagal memuat data kas harian.');
+      }
     } finally {
       setLoading(false);
     }
@@ -158,9 +161,9 @@ const KasHarianPage = () => {
                 <svg className="animate-spin h-10 w-10 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
              </div>
           ) : error ? (
-             <div className="p-8 text-center text-red-600 bg-red-50 rounded-lg m-4">
-              <p className="text-xl font-semibold">Gagal memuat data kas harian</p>
-              <p className="mt-2">{error}</p>
+             <div className="p-6 text-left text-red-800 bg-red-50 border-l-4 border-red-400 rounded-lg m-4">
+                <p className="font-bold text-lg mb-2">Gagal memuat data kas harian</p>
+                <p className="whitespace-pre-wrap">{error}</p>
             </div>
           ) : data.length === 0 ? (
             <p className="text-center text-gray-500 p-8 text-xl">Tidak ada data kas harian.</p>
