@@ -183,14 +183,14 @@ const KasHarianPage = () => {
                 {data.map((item, index) => (
                   <tr key={item.id} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                     <td className="p-4 font-semibold text-gray-800">{formatDate(item.tanggal)}</td>
-                    <td className="p-4 text-center">{item.rp_100k}</td>
-                    <td className="p-4 text-center">{item.rp_50k}</td>
-                    <td className="p-4 text-center">{item.rp_20k}</td>
-                    <td className="p-4 text-center">{item.rp_10k}</td>
-                    <td className="p-4 text-center">{item.rp_5k}</td>
-                    <td className="p-4 text-center">{item.rp_2k}</td>
-                    <td className="p-4 text-center">{item.rp_1k}</td>
-                    <td className="p-4 text-center">{item.rp_500}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_100k}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_50k}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_20k}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_10k}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_5k}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_2k}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_1k}</td>
+                    <td className="p-4 text-center text-gray-700">{item.rp_500}</td>
                     <td className="p-4 text-right font-bold text-brand-primary">
                       {item.total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                     </td>
